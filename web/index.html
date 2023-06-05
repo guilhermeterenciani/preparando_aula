@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de pessoas</title>
+    <style>
+        .form-cadastro {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+        }
+        .tabela{
+            width: 50%;
+            border: 1px solid black;
+        }
+        .tabela thead {
+            background-color: #01318ac1;
+            color:white;
+        }
+        .tabela tbody {
+            background-color: #eee;
+        }
+        .tabela, td, th{
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 15px 30px;
+        }
+        tr:nth-child(even){
+            background-color: #f1efef;
+        }
+
+        .excluir{
+            color:white;
+            padding: 10px 20px;
+            background-color: red;
+            text-decoration: none;
+        }
+        .excluir:hover{
+            background-color: #ff0000c7;
+        }
+        .alterar{
+            color:white;
+            padding: 10px 20px;
+            background-color: #01318ac1;
+            text-decoration: none;
+        }
+        .alterar:hover{
+            background-color: #01318ac1;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Pessoas</h1>
+    <table id="tabela" class="tabela">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Alterar</th>
+                <th>Excluir</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <h1>Cadastrar pessoas</h1>
+    <form id="form-cadastro" class="form-cadastro" action="http://localhost:3000/pessoas" method="POST">
+        <label for="id">Id</label>
+        <input type="number" name="id" id="id">
+        
+        <label for="nome">Nome</label>
+        <input type="text" name="nome" id="nome">
+        
+        <label for="idade">Idade</label>
+        <input type="number" name="idade" id="idade">
+        
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        let url = 'http://localhost:3000/pessoas';
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let pessoas = document.querySelector('#pessoas');
+                let table = document.querySelector('#tabela');
+                data.forEach(pessoa => {
+                    let tr = document.createElement('tr');
+                    let tdId = document.createElement('td');
+                    let tdNome = document.createElement('td');
+                    let tdIdade = document.createElement('td');
+                    tdId.textContent = pessoa.id;
+                    tdNome.textContent = pessoa.nome;
+                    tdIdade.textContent = pessoa.idade;
+                    tr.appendChild(tdId);
+                    tr.appendChild(tdNome);
+                    tr.appendChild(tdIdade);
+
+                    let tdAlterar = document.createElement('td');
+                    let tdExcluir = document.createElement('td');
+                    let aAlterar = document.createElement('a');
+                    aAlterar.classList.add('alterar');
+                    let aExcluir = document.createElement('a');
+                    aExcluir.classList.add('excluir');
+                    aAlterar.textContent = 'Alterar';
+                    aExcluir.textContent = 'Excluir';
+                    aAlterar.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        fetch(url + '/' + pessoa.id)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data)
+                                let form = document.querySelector('#form-cadastro');
+                                form.querySelector('#id').value = data[0].id;
+                                form.querySelector('#nome').value = data[0].nome;
+                                form.querySelector('#idade').value = data[0].idade;
+                                form.querySelector('button').textContent = 'Alterar';
+                                form.addEventListener('submit', (event) => {
+                                    event.preventDefault();
+                                    let id = document.querySelector('#id').value;
+                                    let nome = document.querySelector('#nome').value;
+                                    let idade = document.querySelector('#idade').value;
+                                    let pessoa = {
+                                        id: id,
+                                        nome: nome,
+                                        idade: idade
+                                    };
+                                    fetch(url + '/' + pessoa.id, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(pessoa)
+                                    })
+                                    .then(response => response.json())
+                                    .finally(() => {
+                                        window.location.reload();
+                                    });
+                                });
+                            });
+                    });
+                    aExcluir.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        fetch(url + '/' + pessoa.id, {
+                            method: 'DELETE'
+                        })
+                        .finally(() => {
+                            window.location.reload();
+                        });
+                    });
+                    tdAlterar.appendChild(aAlterar);
+                    tdExcluir.appendChild(aExcluir);
+                    tr.appendChild(tdAlterar);
+                    tr.appendChild(tdExcluir);
+                    tab-ple.appendChild(tr);
+                });
+            }
+            );
+
+        let form = document.querySelector('#form-cadastro');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            let button = document.querySelector('button');
+            if(button.textContent == 'Alterar'){
+                return;
+            }
+            let id = document.querySelector('#id').value;
+            let nome = document.querySelector('#nome').value;
+            let idade = document.querySelector('#idade').value;
+            let pessoa = {
+                id: id,
+                nome: nome,
+                idade: idade
+            };
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pessoa)
+            })
+            .then(response => response.json())
+            .finally(() => {
+                window.location.reload();
+            });
+        }
+        );
+    </script>
+</body>
+</html>
