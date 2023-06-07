@@ -64,8 +64,8 @@ app.put('/pessoas/:id', async (req:Request, res:Response) => {
         password: 'test',
         database: 'test'
     })
-    let sql = 'UPDATE pessoas SET nome = ?, idade = ? WHERE id = ?';
-    let result = await banco.query(sql, [req.body.nome, req.body.idade, req.params.id]);
+    let sql = 'UPDATE pessoas SET id = ?, nome = ?, idade = ? WHERE id = ?';
+    let result = await banco.query(sql, [req.body.id, req.body.nome, req.body.idade, req.params.id]);
     banco.end();
     res.send(JSON.stringify({mensagem:"Atualizado com sucesso"})).status(200);
 });

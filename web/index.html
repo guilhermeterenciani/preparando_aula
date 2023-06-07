@@ -110,38 +110,35 @@
                     aExcluir.textContent = 'Excluir';
                     aAlterar.addEventListener('click', (event) => {
                         event.preventDefault();
-                        fetch(url + '/' + pessoa.id)
+
+                        document.querySelector('#id').value = pessoa.id;
+                        document.querySelector('#nome').value = pessoa.nome;
+                        document.querySelector('#idade').value = pessoa.idade;
+                        document.querySelector("button").textContent = "Alterar"
+
+                        let form = document.querySelector('#form-cadastro');
+                        form.addEventListener('submit', (event) => {
+                            event.preventDefault();
+                            let id = document.querySelector('#id').value;
+                            let nome = document.querySelector('#nome').value;
+                            let idade = document.querySelector('#idade').value;
+                            let pessoaUpdate = {
+                                id: id,
+                                nome: nome,
+                                idade: idade
+                            };
+                            fetch(url + '/' + pessoa.id, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(pessoaUpdate)
+                            })
                             .then(response => response.json())
-                            .then(data => {
-                                console.log(data)
-                                let form = document.querySelector('#form-cadastro');
-                                form.querySelector('#id').value = data[0].id;
-                                form.querySelector('#nome').value = data[0].nome;
-                                form.querySelector('#idade').value = data[0].idade;
-                                form.querySelector('button').textContent = 'Alterar';
-                                form.addEventListener('submit', (event) => {
-                                    event.preventDefault();
-                                    let id = document.querySelector('#id').value;
-                                    let nome = document.querySelector('#nome').value;
-                                    let idade = document.querySelector('#idade').value;
-                                    let pessoa = {
-                                        id: id,
-                                        nome: nome,
-                                        idade: idade
-                                    };
-                                    fetch(url + '/' + pessoa.id, {
-                                        method: 'PUT',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify(pessoa)
-                                    })
-                                    .then(response => response.json())
-                                    .finally(() => {
-                                        window.location.reload();
-                                    });
-                                });
+                            .finally(() => {
+                                window.location.reload();
                             });
+                        });     
                     });
                     aExcluir.addEventListener('click', (event) => {
                         event.preventDefault();
